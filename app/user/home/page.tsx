@@ -156,7 +156,7 @@ export default function UserHomePage() {
             >
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-tight tracking-tight lowercase mb-6">
                 as an admin
-              </h2>
+                </h2>
               
               <ul className="space-y-3 text-lg text-muted-foreground font-light">
                 <li className="flex items-start gap-3">
@@ -178,22 +178,22 @@ export default function UserHomePage() {
               </ul>
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                <Button
-                  onClick={() => router.push("/auth/login")}
+                  <Button
+                    onClick={() => router.push("/auth/login")}
                   variant="primary"
-                  size="lg"
+                    size="lg"
                   className="lowercase"
-                >
+                  >
                   Sign In as Admin
                 </Button>
-                <Button
-                  onClick={() => router.push("/auth/register")}
+                  <Button
+                    onClick={() => router.push("/auth/register")}
                   variant="outline"
-                  size="lg"
+                    size="lg"
                   className="lowercase"
-                >
-                  Create an Admin Account
-                </Button>
+                  >
+                    Create an Admin Account
+                  </Button>
               </div>
             </motion.div>
           </div>
@@ -214,7 +214,7 @@ export default function UserHomePage() {
             >
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-tight tracking-tight lowercase">
                 as a user
-              </h2>
+                </h2>
               
               <ul className="space-y-3 text-lg text-muted-foreground font-light">
                 <li className="flex items-start gap-3">
@@ -240,14 +240,14 @@ export default function UserHomePage() {
                 >
                   Enter Access Key
                 </Button>
-                <Button
-                  onClick={() => router.push("/auth/login")}
+                  <Button
+                    onClick={() => router.push("/auth/login")}
                   variant="outline"
-                  size="lg"
+                    size="lg"
                   className="lowercase"
-                >
+                  >
                   Sign In as User
-                </Button>
+                  </Button>
               </div>
             </motion.div>
 

@@ -101,14 +101,14 @@ export default function LoginPage() {
               <Label htmlFor="email" className="text-sm font-light text-muted-foreground">
                 Email
               </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                 className="font-light"
-              />
+                />
               {errors.email ? (
                 <p className="text-xs text-muted-foreground font-light">{errors.email}</p>
               ) : null}

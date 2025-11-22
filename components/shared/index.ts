@@ -17,5 +17,6 @@ export { ThemeToggle } from "./theme-toggle";
 export { PagePlaceholder } from "./page-placeholder";
 export { FormsProvider, useForms } from "./forms-store";
 export { MockAuthProvider, useMockAuth } from "./mock-auth-provider";
+export { AdminChatbot } from "./admin-chatbot";
 
 

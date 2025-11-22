@@ -110,14 +110,14 @@ export default function RegisterPage() {
               <Label htmlFor="name" className="text-sm font-light text-muted-foreground">
                 Name
               </Label>
-              <Input
-                id="name"
-                type="text"
+                <Input
+                  id="name"
+                  type="text"
                 placeholder="Your name"
-                value={form.name}
-                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                  value={form.name}
+                  onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                 className="font-light"
-              />
+                />
               {errors.name ? (
                 <p className="text-xs text-muted-foreground font-light">{errors.name}</p>
               ) : null}
@@ -127,14 +127,14 @@ export default function RegisterPage() {
               <Label htmlFor="email" className="text-sm font-light text-muted-foreground">
                 Email
               </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                 className="font-light"
-              />
+                />
               {errors.email ? (
                 <p className="text-xs text-muted-foreground font-light">{errors.email}</p>
               ) : null}

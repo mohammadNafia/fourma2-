@@ -231,7 +231,7 @@ export default function UserFormsPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-2">
+      <div className="space-y-2">
           <h1 className="text-4xl font-bold text-foreground lowercase">my forms</h1>
           <p className="text-lg text-muted-foreground font-light">View and manage your form responses.</p>
         </div>

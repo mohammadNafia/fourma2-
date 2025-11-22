@@ -914,7 +914,12 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
       submissions: [],
     };
 
-    setForms((prev) => [form, ...prev]);
+    setForms((prev) => {
+      const updated = [form, ...prev];
+      // Save immediately to localStorage (don't wait for debounce) since this is a critical publish operation
+      saveFormsToStorage(updated);
+      return updated;
+    });
     return form;
   };
 
