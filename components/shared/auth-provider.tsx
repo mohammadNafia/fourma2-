@@ -188,3 +188,4 @@ export function useAuth() {
 export const useAuthStore = useAuth;
 export const useMockAuth = useAuth; // Keep for backward compatibility during migration
 
+

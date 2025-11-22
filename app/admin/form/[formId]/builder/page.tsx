@@ -22,7 +22,9 @@ import {
   ToggleLeft,
   Upload,
   Trash,
+  ExternalLink,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -127,6 +129,7 @@ function fieldPreview(field: FormField) {
 
 export default function FormBuilderPage() {
   const params = useParams();
+  const router = useRouter();
   const formId = params.formId as string;
   const {
     getFormById,
@@ -141,6 +144,11 @@ export default function FormBuilderPage() {
   } = useForms();
   const form = getFormById(formId);
   const [selected, setSelected] = useState<Selected>(null);
+
+  const handleTestAsUser = () => {
+    if (!form) return;
+    window.open(`/user/form/${form.accessKey}?test=true`, "_blank");
+  };
 
   useEffect(() => {
     if (form && !form.sections.length) {
@@ -183,9 +191,26 @@ export default function FormBuilderPage() {
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
-      {/* Left Sidebar */}
-      <Card className="h-fit border-border/70 bg-card/80">
+    <div className="space-y-4">
+      {/* Header with Test Button */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-foreground lowercase">{form.title}</h1>
+          <p className="text-sm text-muted-foreground font-light">Build your form by adding fields and sections</p>
+        </div>
+        <Button
+          onClick={handleTestAsUser}
+          variant="primary"
+          className="gap-2 lowercase"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Test as User
+        </Button>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[280px_1fr_320px]">
+        {/* Left Sidebar */}
+        <Card className="h-fit border-border/70 bg-card/80">
         <CardHeader>
           <CardTitle className="text-lg">Add a Field</CardTitle>
         </CardHeader>
@@ -533,6 +558,7 @@ export default function FormBuilderPage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

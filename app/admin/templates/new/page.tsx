@@ -24,6 +24,7 @@ import {
   Trash,
   ArrowLeft,
   Save,
+  Rocket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -128,7 +129,7 @@ function fieldPreview(field: FormField) {
 
 export default function NewTemplatePage() {
   const router = useRouter();
-  const { addTemplate } = useForms();
+  const { addTemplate, publishTemplateAsForm } = useForms();
   const { toast } = useToast();
   const [sections, setSections] = useState<FormSection[]>([]);
   const [selected, setSelected] = useState<Selected>(null);
@@ -266,6 +267,31 @@ export default function NewTemplatePage() {
     }
   };
 
+  const handlePublish = () => {
+    if (!templateName.trim()) {
+      toast("Template name is required", "error");
+      return;
+    }
+    if (!sections.length || sections.every(s => s.fields.length === 0)) {
+      toast("Please add at least one field to the template before publishing", "error");
+      return;
+    }
+    
+    try {
+      // First save as template
+      const template = addTemplate(templateName.trim(), templateDescription.trim(), templateCategory.trim() || null, sections);
+      
+      // Then publish as form immediately
+      const form = publishTemplateAsForm(template.templateId);
+      
+      toast(`Form published successfully! Access Key: ${form.accessKey}`, "success");
+      router.push(`/admin/form/${form.id}/edit`);
+    } catch (error) {
+      toast("Failed to publish form", "error");
+      console.error(error);
+    }
+  };
+
   const selectedField = useMemo(() => {
     if (!selected) return null;
     const section = sections.find((s) => s.id === selected.sectionId);
@@ -284,10 +310,16 @@ export default function NewTemplatePage() {
             <p className="text-muted-foreground">Build a reusable template structure</p>
           </div>
         </div>
-        <Button variant="primary" onClick={handleSave} className="gap-2">
-          <Save className="h-4 w-4" />
-          Save Template
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleSave} className="gap-2 lowercase">
+            <Save className="h-4 w-4" />
+            Save Template
+          </Button>
+          <Button variant="primary" onClick={handlePublish} className="gap-2 lowercase">
+            <Rocket className="h-4 w-4" />
+            Publish
+          </Button>
+        </div>
       </div>
 
       <Card className="border-border/70 bg-card/80">
@@ -568,4 +600,5 @@ export default function NewTemplatePage() {
     </div>
   );
 }
+
 

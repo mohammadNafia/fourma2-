@@ -5,7 +5,7 @@
 import { type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LogOut, User, Workflow } from "lucide-react";
+import { ChevronDown, LogOut, User, Workflow, BookOpen } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,16 +60,16 @@ export function Navbar({ centerSlot }: NavbarProps) {
   );
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-40 border-b border-border bg-background transition-all duration-200">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
-          <Link href="/" className="group inline-flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[--primary-gradient] text-sm font-semibold text-primary-foreground shadow-[0_10px_30px_rgba(124,58,237,0.4)] transition-transform duration-150 group-hover:scale-105">
-              Φ
+          <Link href="/" className="group inline-flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-primary text-primary-foreground border border-border transition-all duration-200 group-hover:scale-[1.02]">
+              <span className="text-base font-bold lowercase">Φ</span>
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-base font-semibold text-foreground">Flow</span>
-              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Form Studio</span>
+              <span className="text-base font-bold text-foreground tracking-tight lowercase">Flow</span>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground font-light">Form Studio</span>
             </div>
           </Link>
         </div>
@@ -77,16 +77,22 @@ export function Navbar({ centerSlot }: NavbarProps) {
         <div className="flex flex-1 items-center justify-center">{placeholder}</div>
 
         <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm" className="text-sm">
+            <Link href="/documentation" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden sm:inline">Documentation</span>
+            </Link>
+          </Button>
           <ThemeToggle />
 
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="h-10 rounded-full border-border/70 bg-card/60 pr-2 pl-1">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground/10 text-sm font-semibold text-foreground">
+                <Button variant="outline" className="h-10 rounded-[10px] border-border bg-card pr-2 pl-1 hover:bg-secondary">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-secondary text-xs font-medium text-foreground border border-border">
                     {getInitials(userName)}
                   </div>
-                  <span className="mx-2 text-sm text-foreground">{userName}</span>
+                  <span className="mx-2 text-sm font-medium text-foreground lowercase">{userName}</span>
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </DropdownMenuTrigger>
@@ -124,14 +130,14 @@ export function Navbar({ centerSlot }: NavbarProps) {
             </DropdownMenu>
           ) : (
             <div className="flex items-center gap-2">
-              <Button asChild variant="ghost" size="sm" className="text-sm">
+              <Button asChild variant="ghost" size="sm" className="text-sm lowercase">
                 <Link href="/auth/login">Sign in</Link>
               </Button>
               <Button
                 asChild
                 variant="primary"
                 size="sm"
-                className="hidden shadow-[0_12px_40px_rgba(79,70,229,0.45)] sm:inline-flex"
+                className="hidden sm:inline-flex lowercase"
                 onClick={() => quickLoginUser()}
               >
                 <Link href="/auth/register">Create account</Link>

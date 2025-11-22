@@ -230,9 +230,18 @@ export default function UserFormsPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold text-foreground">My Forms</h1>
-        <p className="text-lg text-muted-foreground">View and manage your form responses.</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-foreground lowercase">my forms</h1>
+          <p className="text-lg text-muted-foreground font-light">View and manage your form responses.</p>
+        </div>
+        <Button
+          onClick={() => router.push("/user/access-key")}
+          variant="primary"
+          className="lowercase"
+        >
+          Enter Access Key
+        </Button>
       </div>
 
       {userForms.length === 0 ? (
@@ -241,10 +250,17 @@ export default function UserFormsPage() {
             <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
             <div>
               <h3 className="text-lg font-semibold mb-2">No forms yet</h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-muted-foreground mb-4 font-light">
                 You haven't accessed any forms yet. Use an access key to get started.
               </p>
-              <Button onClick={() => router.push("/user/home")}>Go to Home</Button>
+              <div className="flex gap-3 justify-center">
+                <Button onClick={() => router.push("/user/access-key")} variant="primary" className="lowercase">
+                  Enter Access Key
+                </Button>
+                <Button onClick={() => router.push("/user/home")} variant="outline" className="lowercase">
+                  Go to Home
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

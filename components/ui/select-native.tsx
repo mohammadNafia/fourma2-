@@ -11,9 +11,10 @@ const SelectNative = React.forwardRef<HTMLSelectElement, SelectNativeProps>(
         <select
           ref={ref}
           className={cn(
-            "w-full appearance-none rounded-lg border border-border/70 bg-background/80 px-4 py-3 pr-12 text-sm text-foreground shadow-[0_10px_40px_rgba(0,0,0,0.25)] backdrop-blur-sm",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+            "w-full appearance-none rounded-xl border border-input bg-background px-4 py-3 pr-12 text-sm text-foreground font-light",
+            "focus-visible:outline-none focus-visible:border-primary focus-visible:ring-1 focus-visible:ring-primary",
             "disabled:cursor-not-allowed disabled:opacity-50",
+            "transition-colors duration-200",
             className,
           )}
           {...props}

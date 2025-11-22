@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, User as UserIcon } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,7 +75,6 @@ export default function RegisterPage() {
       register({ name: form.name.trim(), role: normalizedRole });
       toast("Account created successfully!", "success");
       
-      // Small delay to show toast before navigation
       setTimeout(() => {
         router.push(normalizedRole === "admin" ? "/admin/home" : "/user/home");
       }, 300);
@@ -89,107 +88,115 @@ export default function RegisterPage() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
     >
-      <Card className="mx-auto max-w-md border-border/70 bg-card/80 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.25)]">
+      <Card className="mx-auto max-w-md border-border bg-card p-8 shadow-inset">
         <CardContent className="space-y-6">
-          <div className="space-y-2 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[--primary-gradient] text-lg font-semibold text-primary-foreground shadow-[0_12px_40px_rgba(99,102,241,0.25)] dark:shadow-[0_12px_40px_rgba(124,58,237,0.45)]">
-              Φ
-            </div>
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">Create your Flow account</h1>
-              <p className="text-sm text-muted-foreground">Join us and start building your forms.</p>
+          <div className="space-y-3 text-center">
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold text-foreground lowercase tracking-tight">
+                create account
+              </h1>
+              <p className="text-sm text-muted-foreground font-light">
+                Join us and start building your forms
+              </p>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <div className="relative">
-                <UserIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Mohammed Ali"
-                  value={form.name}
-                  onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                  className="pl-9"
-                />
-              </div>
-              {errors.name ? <p className="text-xs text-destructive">{errors.name}</p> : null}
+              <Label htmlFor="name" className="text-sm font-light text-muted-foreground">
+                Name
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Your name"
+                value={form.name}
+                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                className="font-light"
+              />
+              {errors.name ? (
+                <p className="text-xs text-muted-foreground font-light">{errors.name}</p>
+              ) : null}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                  className="pl-9"
-                />
-              </div>
-              {errors.email ? <p className="text-xs text-destructive">{errors.email}</p> : null}
+              <Label htmlFor="email" className="text-sm font-light text-muted-foreground">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                className="font-light"
+              />
+              {errors.email ? (
+                <p className="text-xs text-muted-foreground font-light">{errors.email}</p>
+              ) : null}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-light text-muted-foreground">
+                Password
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••••••"
+                  placeholder="••••••••"
                   value={form.password}
                   onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
-                  className="pl-9 pr-10"
+                  className="pr-10 font-light"
                 />
                 <button
                   type="button"
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              {errors.password ? <p className="text-xs text-destructive">{errors.password}</p> : null}
+              {errors.password ? (
+                <p className="text-xs text-muted-foreground font-light">{errors.password}</p>
+              ) : null}
             </div>
 
-            <div className="space-y-3">
-              <Label className="text-sm">Account Type</Label>
+            <div className="space-y-2">
+              <Label className="text-sm font-light text-muted-foreground">Account Type</Label>
               <RadioGroup
                 value={form.role}
                 onValueChange={(value) => setForm((prev) => ({ ...prev, role: value as "admin" | "user" }))}
-                className="grid grid-cols-2 gap-3"
+                className="grid grid-cols-2 gap-2"
               >
                 {["admin", "user"].map((role) => (
                   <label
                     key={role}
-                    className="flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 bg-card/60 px-3 py-2 text-sm capitalize hover:border-border"
+                    className="flex cursor-pointer items-center gap-2 rounded-[10px] border border-border bg-card px-3 py-2.5 text-sm font-light hover:bg-secondary transition-colors duration-200"
                   >
                     <RadioGroupItem value={role} />
-                    {role}
+                    <span className="lowercase">{role}</span>
                   </label>
                 ))}
               </RadioGroup>
-              {errors.role ? <p className="text-xs text-destructive">{errors.role}</p> : null}
+              {errors.role ? (
+                <p className="text-xs text-muted-foreground font-light">{errors.role}</p>
+              ) : null}
             </div>
 
-            <Button type="submit" variant="primary" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" variant="primary" className="w-full lowercase" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-sm text-muted-foreground font-light">
             Already have an account?{" "}
-            <Link href="/auth/login" className="font-semibold text-primary hover:underline">
+            <Link href="/auth/login" className="font-medium text-foreground hover:opacity-80 transition-opacity duration-200">
               Sign in
             </Link>
           </div>

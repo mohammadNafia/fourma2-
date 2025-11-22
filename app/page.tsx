@@ -1,139 +1,295 @@
 'use client';
 
-import { motion } from "framer-motion";
-import { AppShell } from "@/components/shared/app-shell";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ChevronDown, ArrowRight, Sparkles, Settings, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 
-const routes = [
-  "/auth/login",
-  "/auth/register",
-  "/admin/home",
-  "/admin/new-form",
-  "/admin/form/[formId]/edit",
-  "/admin/form/[formId]/builder",
-  "/admin/form/[formId]/dashboard",
-  "/user/home",
-  "/user/forms",
-  "/user/form/[accessKey]",
-];
+export default function HomePage() {
+  const router = useRouter();
+  const conceptRef = useRef<HTMLDivElement>(null);
+  const adminRef = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
 
-export default function Home() {
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
-    <AppShell
-      title="Flow Form Builder — Core Skeleton Ready"
-      description="Premium dark-mode foundation with Next.js 14 + React 19, Tailwind v4, and shadcn/UI v2. All required routes, providers, and theme primitives are scaffolded for the upcoming UI build."
-    >
-      <motion.div
-        className="grid gap-6 md:grid-cols-3"
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
+    <div className="relative w-full overflow-x-hidden bg-background">
+      {/* Hero Section */}
+      <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          style={{ opacity: heroOpacity }}
+          className="relative z-10 text-center space-y-8 px-4 max-w-4xl mx-auto"
+        >
+          {/* Main Title - Minimal Typography */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight lowercase leading-[1.1]"
+          >
+            flow form
+            <br />
+            builder
+          </motion.h1>
+
+          {/* Descriptive Sentence */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto font-light leading-relaxed"
+          >
+            A platform designed to help you build websites and forms with ease.
+          </motion.p>
+
+          {/* Scroll Arrow */}
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+            onClick={() => scrollToSection(conceptRef)}
+            className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-muted-foreground hover:text-foreground transition-colors duration-200"
+          >
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <ChevronDown className="h-6 w-6" />
+            </motion.div>
+            <div className="h-12 w-px bg-border opacity-50" />
+          </motion.button>
+        </motion.div>
+      </section>
+
+      {/* Concept Introduction Section */}
+      <section
+        ref={conceptRef}
+        className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-32"
       >
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle>Tech Stack Locked</CardTitle>
-            <CardDescription>
-              Next.js 14 (App Router) · React 19 · TypeScript 5 · Tailwind CSS v4 · shadcn/UI v2 ·
-              Framer Motion · Lucide icons
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-lg border border-border/60 bg-foreground/5 p-4">
-              <p className="text-sm font-semibold text-foreground">Theme DNA</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Dark-first palette with primary gradient (#4F46E5 → #9333EA), luxury spacing,
-                gradients, and smooth focus states.
-              </p>
-            </div>
-            <div className="rounded-lg border border-border/60 bg-foreground/5 p-4">
-              <p className="text-sm font-semibold text-foreground">Animations</p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Framer Motion wired for page scaffolds; global blur + glow for Apple-like smoothness.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative z-10 max-w-7xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Visual Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <Card>
+                <CardContent className="p-8">
+                  <div className="relative aspect-video rounded-[10px] overflow-hidden flex items-center justify-center bg-card border border-border">
+                    <Sparkles className="h-16 w-16 text-muted-foreground" />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-light tracking-wide text-center mt-6 uppercase">
+                    Form Builder Interface
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Global Rules</CardTitle>
-            <CardDescription>Dark by default, consistent padding, responsive cards, smooth hover.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted-foreground">
-            <p>Light/Dark toggle is available from the shell header and persisted locally.</p>
-            <Separator className="bg-border/50" />
-            <p>Color tokens live in <code className="text-foreground">app/globals.css</code>.</p>
-          </CardContent>
-        </Card>
-      </motion.div>
+            {/* Right: Text */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              className="space-y-6"
+            >
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight lowercase">
+                build with
+                <br />
+                clarity & flow
+              </h2>
+              <div className="space-y-4">
+                <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed font-light max-w-xl">
+                  Flow Form Builder gives you the tools to quickly create forms, pages, and components with a smooth, structured workflow.
+                </p>
+                <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed font-light max-w-xl">
+                  We focus on clarity, usability, and a premium experience — so you can build without limits.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
-      <motion.div
-        className="grid gap-6 lg:grid-cols-3"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1, duration: 0.35, ease: "easeOut" }}
+      {/* Admin Features Section */}
+      <section
+        ref={adminRef}
+        className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-32"
       >
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Routing Blueprint</CardTitle>
-            <CardDescription>All required directories are pre-created to keep the build fast.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-xl border border-border/70 bg-card/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Admin
-              </p>
-              <ul className="mt-2 space-y-1 text-sm text-foreground/90">
-                {routes.slice(2, 7).map((route) => (
-                  <li key={route} className="flex items-center justify-between rounded-lg bg-foreground/5 px-3 py-2">
-                    <span>{route}</span>
-                    <span className="text-[11px] text-muted-foreground">scaffolded</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-xl border border-border/70 bg-card/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                Auth & User
-              </p>
-              <ul className="mt-2 space-y-1 text-sm text-foreground/90">
-                {routes.slice(0, 2).concat(routes.slice(7)).map((route) => (
-                  <li key={route} className="flex items-center justify-between rounded-lg bg-foreground/5 px-3 py-2">
-                    <span>{route}</span>
-                    <span className="text-[11px] text-muted-foreground">scaffolded</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative z-10 max-w-7xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Visual */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              className="relative order-2 lg:order-1"
+            >
+              <Card>
+                <CardContent className="p-8">
+                  <div className="relative aspect-video rounded-[10px] overflow-hidden flex items-center justify-center bg-card border border-border">
+                    <Settings className="h-16 w-16 text-muted-foreground" />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-light tracking-wide text-center mt-6 uppercase">
+                    Admin Dashboard
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Shadcn/UI Kits</CardTitle>
-            <CardDescription>Base primitives added manually for Tailwind v4.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <p className="text-muted-foreground">
-              Installed: button, card, checkbox, input, label, separator, textarea, radio-group, dropdown-menu,
-              select-native, utils.
-            </p>
-            <div className="rounded-lg border border-border/60 bg-foreground/5 p-3 text-xs text-muted-foreground">
-              Ready for <code className="text-foreground">npx shadcn@latest add ...</code> commands if we
-              need more components.
-            </div>
-            <Button variant="secondary" className="w-full">View component stubs</Button>
-          </CardContent>
-        </Card>
-      </motion.div>
-    </AppShell>
+            {/* Right: Text & Buttons */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              className="space-y-8 order-1 lg:order-2"
+            >
+              <div className="space-y-6">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight lowercase">
+                  as an
+                  <br />
+                  admin
+                </h2>
+                <ul className="space-y-3 text-lg sm:text-xl text-muted-foreground font-light">
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Create and customize forms</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Manage user submissions</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Build full pages and UI components</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Control settings and behavior with a simple interface</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button
+                  onClick={() => router.push("/auth/login")}
+                  variant="primary"
+                  size="lg"
+                  className="group"
+                >
+                  <span className="flex items-center gap-2 lowercase">
+                    Sign In as Admin
+                    <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  </span>
+                </Button>
+                <Button
+                  onClick={() => router.push("/auth/register")}
+                  variant="outline"
+                  size="lg"
+                  className="lowercase"
+                >
+                  Create an Admin Account
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* User Features Section */}
+      <section
+        ref={userRef}
+        className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-32"
+      >
+        <div className="relative z-10 max-w-7xl mx-auto w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Text & Button */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              className="space-y-8"
+            >
+              <div className="space-y-6">
+                <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight lowercase">
+                  as a
+                  <br />
+                  user
+                </h2>
+                <ul className="space-y-3 text-lg sm:text-xl text-muted-foreground font-light">
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Submit forms with a clean, simple UI</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Track your submissions</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <ArrowRight className="h-5 w-5 mt-0.5 flex-shrink-0 text-foreground" />
+                    <span>Interact with custom-built pages</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <Button
+                onClick={() => router.push("/auth/login")}
+                variant="primary"
+                size="lg"
+                className="group lowercase"
+              >
+                <span className="flex items-center gap-2">
+                  Sign In as User
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                </span>
+              </Button>
+            </motion.div>
+
+            {/* Right: Visual */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <Card>
+                <CardContent className="p-8">
+                  <div className="relative aspect-video rounded-[10px] overflow-hidden flex items-center justify-center bg-card border border-border">
+                    <Users className="h-16 w-16 text-muted-foreground" />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-light tracking-wide text-center mt-6 uppercase">
+                    User Interface
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer - Minimal */}
+      <footer className="relative border-t border-border px-4 py-16 text-center">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-sm text-muted-foreground font-light tracking-wide">
+            © 2025 Flow Form Builder. Crafted with precision and care.
+          </p>
+        </div>
+      </footer>
+    </div>
   );
 }

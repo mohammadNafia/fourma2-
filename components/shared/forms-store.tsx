@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 export type FieldType =
   | "shortText"
@@ -109,6 +109,7 @@ type FormsContextValue = {
   duplicateTemplate: (templateId: string) => Template;
   getTemplateById: (templateId: string) => Template | undefined;
   createFormFromTemplate: (templateId: string) => FormModel;
+  publishTemplateAsForm: (templateId: string) => FormModel;
   saveFormAsTemplate: (formId: string, name: string, description: string, category: string | null) => Template;
   addSection: (formId: string) => FormSection;
   updateSection: (formId: string, sectionId: string, data: Partial<Pick<FormSection, "title" | "description">>) => void;
@@ -211,11 +212,152 @@ const seedForms: FormModel[] = [
   },
 ];
 
+const FORMS_STORAGE_KEY = "flow_forms";
+const TEMPLATES_STORAGE_KEY = "flow_templates";
+const USER_FORMS_STORAGE_KEY = "flow_user_forms";
+
+// Load from localStorage on initial render
+function loadFormsFromStorage(): FormModel[] {
+  if (typeof window === "undefined") return seedForms;
+  try {
+    const stored = localStorage.getItem(FORMS_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Merge with seed forms to ensure we always have default forms
+      const seedIds = new Set(seedForms.map((f) => f.id));
+      const storedOnly = parsed.filter((f: FormModel) => !seedIds.has(f.id));
+      return [...seedForms, ...storedOnly];
+    }
+  } catch (error) {
+    console.error("Failed to load forms from storage:", error);
+  }
+  return seedForms;
+}
+
+function loadTemplatesFromStorage(): Template[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(TEMPLATES_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error("Failed to load templates from storage:", error);
+  }
+  return [];
+}
+
+function loadUserFormsFromStorage(): UserFormEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = localStorage.getItem(USER_FORMS_STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error("Failed to load user forms from storage:", error);
+  }
+  return [];
+}
+
+// Save to localStorage
+function saveFormsToStorage(forms: FormModel[]) {
+  if (typeof window === "undefined") return;
+  try {
+    // Only save non-seed forms
+    const seedIds = new Set(seedForms.map((f) => f.id));
+    const toSave = forms.filter((f) => !seedIds.has(f.id));
+    localStorage.setItem(FORMS_STORAGE_KEY, JSON.stringify(toSave));
+  } catch (error) {
+    console.error("Failed to save forms to storage:", error);
+  }
+}
+
+function saveTemplatesToStorage(templates: Template[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(TEMPLATES_STORAGE_KEY, JSON.stringify(templates));
+  } catch (error) {
+    console.error("Failed to save templates to storage:", error);
+  }
+}
+
+function saveUserFormsToStorage(userForms: UserFormEntry[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(USER_FORMS_STORAGE_KEY, JSON.stringify(userForms));
+  } catch (error) {
+    console.error("Failed to save user forms to storage:", error);
+  }
+}
+
 export function FormsProvider({ children }: { children: React.ReactNode }) {
-  const [forms, setForms] = useState<FormModel[]>(seedForms);
-  const [userForms, setUserForms] = useState<UserFormEntry[]>([]);
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [forms, setForms] = useState<FormModel[]>(() => {
+    // Load forms synchronously on initial mount
+    if (typeof window !== "undefined") {
+      return loadFormsFromStorage();
+    }
+    return seedForms;
+  });
+  const [userForms, setUserForms] = useState<UserFormEntry[]>(() => {
+    if (typeof window !== "undefined") {
+      return loadUserFormsFromStorage();
+    }
+    return [];
+  });
+  const [templates, setTemplates] = useState<Template[]>(() => {
+    if (typeof window !== "undefined") {
+      return loadTemplatesFromStorage();
+    }
+    return [];
+  });
   const keysRef = useRef<Set<string>>(new Set(forms.map((f) => f.accessKey)));
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize keysRef with all loaded forms on mount
+  useEffect(() => {
+    keysRef.current = new Set(forms.map((f) => f.accessKey));
+  }, []); // Only run on mount
+
+  // Update keys ref immediately when forms change (for access key generation)
+  useEffect(() => {
+    keysRef.current = new Set(forms.map((f) => f.accessKey));
+  }, [forms]);
+
+  // Sync forms to localStorage with debouncing to prevent lag
+  useEffect(() => {
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    // Save immediately for critical operations, debounce for rapid changes
+    saveTimeoutRef.current = setTimeout(() => {
+      saveFormsToStorage(forms);
+    }, 200);
+    
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, [forms]);
+
+  // Sync templates to localStorage with debouncing
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      saveTemplatesToStorage(templates);
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, [templates]);
+
+  // Sync userForms to localStorage with debouncing
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      saveUserFormsToStorage(userForms);
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, [userForms]);
 
   const createForm = (data?: Partial<Pick<FormModel, "title" | "description" | "status">>) => {
     const accessKey = generateAccessKey(keysRef.current);
@@ -239,7 +381,12 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
       ],
       submissions: [],
     };
-    setForms((prev) => [form, ...prev]);
+    setForms((prev) => {
+      const updated = [form, ...prev];
+      // Save immediately to localStorage (don't wait for debounce)
+      saveFormsToStorage(updated);
+      return updated;
+    });
     return form;
   };
 
@@ -252,8 +399,8 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateForm = (id: string, data: Partial<Pick<FormModel, "title" | "description" | "category" | "status" | "allowMultipleSubmissions" | "anonymousResponses" | "closingDate">>) => {
-    setForms((prev) =>
-      prev.map((form) =>
+    setForms((prev) => {
+      const updated = prev.map((form) =>
         form.id === id
           ? {
               ...form,
@@ -262,8 +409,13 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
               updatedAt: new Date().toISOString(),
             }
           : form,
-      ),
-    );
+      );
+      // Save immediately if status is being changed to published (critical operation)
+      if (data.status === "published") {
+        saveFormsToStorage(updated);
+      }
+      return updated;
+    });
   };
 
   const regenerateAccessKey = (id: string): string => {
@@ -311,13 +463,54 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
       submissions: [], // No submissions in duplicate
     };
 
-    setForms((prev) => [duplicated, ...prev]);
+    setForms((prev) => {
+      const updated = [duplicated, ...prev];
+      // Save immediately to localStorage (don't wait for debounce)
+      saveFormsToStorage(updated);
+      return updated;
+    });
     return duplicated;
   };
 
   const getFormById = (id: string) => forms.find((f) => f.id === id);
 
-  const getFormByAccessKey = (accessKey: string) => forms.find((f) => f.accessKey === accessKey.toUpperCase());
+  const getFormByAccessKey = (accessKey: string): FormModel | undefined => {
+    if (!accessKey) return undefined;
+    const upperKey = accessKey.toUpperCase().trim();
+    
+    // First try to find in current forms state
+    let form = forms.find((f) => f.accessKey === upperKey);
+    
+    // If not found, try loading from localStorage directly (for cases where state hasn't updated yet)
+    if (!form && typeof window !== "undefined") {
+      try {
+        // Check stored forms
+        const stored = localStorage.getItem(FORMS_STORAGE_KEY);
+        if (stored) {
+          const parsed: FormModel[] = JSON.parse(stored);
+          form = parsed.find((f) => f.accessKey === upperKey);
+        }
+        
+        // Also check seed forms
+        if (!form) {
+          const seedForm = seedForms.find((f) => f.accessKey === upperKey);
+          if (seedForm) form = seedForm;
+        }
+        
+        // If found in localStorage but not in state, update state (this shouldn't happen but helps with sync)
+        if (form && !forms.find((f) => f.id === form!.id)) {
+          // Form exists in storage but not in state - this is a sync issue
+          // Reload forms from storage to sync
+          const allForms = loadFormsFromStorage();
+          setForms(allForms);
+        }
+      } catch (error) {
+        console.error("Failed to load form from storage:", error);
+      }
+    }
+    
+    return form;
+  };
 
   const addSection = (formId: string) => {
     const section: FormSection = {
@@ -691,6 +884,36 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
       submissions: [],
     };
 
+    setForms((prev) => {
+      const updated = [form, ...prev];
+      // Save immediately to localStorage (don't wait for debounce)
+      saveFormsToStorage(updated);
+      return updated;
+    });
+    return form;
+  };
+
+  const publishTemplateAsForm = (templateId: string): FormModel => {
+    const template = getTemplateById(templateId);
+    if (!template) throw new Error("Template not found");
+
+    const accessKey = generateAccessKey(keysRef.current);
+    keysRef.current.add(accessKey);
+    const now = new Date().toISOString();
+
+    const form: FormModel = {
+      id: randomId(),
+      title: template.name,
+      description: template.description,
+      category: template.category || undefined,
+      accessKey,
+      createdAt: now,
+      updatedAt: now,
+      status: "published", // Published immediately
+      sections: JSON.parse(JSON.stringify(template.sections)), // Deep copy
+      submissions: [],
+    };
+
     setForms((prev) => [form, ...prev]);
     return form;
   };
@@ -735,6 +958,7 @@ export function FormsProvider({ children }: { children: React.ReactNode }) {
       duplicateTemplate,
       getTemplateById,
       createFormFromTemplate,
+      publishTemplateAsForm,
       saveFormAsTemplate,
     }),
     [forms, userForms, templates],

@@ -13,6 +13,7 @@ import {
   Activity,
   Target,
   PieChart,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -175,6 +176,14 @@ export default function FormDashboardPage() {
               "Draft"
             )}
           </Badge>
+          <Button
+            onClick={() => window.open(`/user/form/${form.accessKey}?test=true`, "_blank")}
+            variant="primary"
+            className="gap-2 lowercase"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Test as User
+          </Button>
           <Button asChild variant="outline">
             <Link href={`/admin/form/${form.id}/builder`}>
               <FileText className="mr-2 h-4 w-4" />

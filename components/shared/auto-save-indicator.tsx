@@ -19,16 +19,24 @@ export function AutoSaveIndicator({ saved }: { saved: boolean }) {
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="fixed top-20 right-4 z-50 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-500/20 px-4 py-2 text-sm text-green-400 shadow-[0_10px_40px_rgba(0,0,0,0.3)] backdrop-blur-md"
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+          className="fixed top-20 right-4 z-50 flex items-center gap-2.5 rounded-2xl border border-[--aqua-teal]/50 bg-[--aqua-teal]/10 px-5 py-3 text-sm font-medium text-[--aqua-teal] shadow-glow-aqua shadow-[0_12px_40px_rgba(0,0,0,0.3)] backdrop-blur-xl backdrop-saturate-180"
         >
-          <Check className="h-4 w-4" />
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 20 }}
+          >
+            <Check className="h-4 w-4" />
+          </motion.div>
           <span>Saved</span>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
+
 

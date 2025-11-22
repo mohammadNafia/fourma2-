@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,9 +32,22 @@ export default function FormEditPage() {
   const [closingDate, setClosingDate] = useState("");
   const [savedIndicator, setSavedIndicator] = useState(false);
   const [showRegenerateConfirm, setShowRegenerateConfirm] = useState(false);
+  const isInitializedRef = useRef(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isSavingRef = useRef(false);
+  const initialValuesRef = useRef<{
+    title: string;
+    description: string;
+    category: string;
+    status: "draft" | "published";
+    allowMultipleSubmissions: boolean;
+    anonymousResponses: boolean;
+    closingDate: string;
+  } | null>(null);
 
+  // Initialize form data from props - only once when form first loads
   useEffect(() => {
-    if (form) {
+    if (form && !isInitializedRef.current) {
       setFormName(form.title);
       setFormDescription(form.description);
       setCategory(form.category || "");
@@ -42,36 +55,92 @@ export default function FormEditPage() {
       setAllowMultipleSubmissions(form.allowMultipleSubmissions ?? false);
       setAnonymousResponses(form.anonymousResponses ?? false);
       setClosingDate(form.closingDate || "");
+      
+      // Store initial values for comparison
+      initialValuesRef.current = {
+        title: form.title,
+        description: form.description,
+        category: form.category || "",
+        status: form.status,
+        allowMultipleSubmissions: form.allowMultipleSubmissions ?? false,
+        anonymousResponses: form.anonymousResponses ?? false,
+        closingDate: form.closingDate || "",
+      };
+      
+      isInitializedRef.current = true;
     }
-  }, [form]);
+    // Reset initialization flag when formId changes
+    if (form?.id !== formId) {
+      isInitializedRef.current = false;
+      initialValuesRef.current = null;
+    }
+  }, [form, formId]);
 
+  // Auto-save with debouncing - only save when user makes changes
   useEffect(() => {
-    if (!form) return;
+    if (!form || !isInitializedRef.current || !initialValuesRef.current || isSavingRef.current) return;
     
-    // Only save if values have changed from initial form values
-    if (
-      formName !== form.title ||
-      formDescription !== form.description ||
-      category !== (form.category || "") ||
-      status !== form.status ||
-      allowMultipleSubmissions !== (form.allowMultipleSubmissions ?? false) ||
-      anonymousResponses !== (form.anonymousResponses ?? false) ||
-      closingDate !== (form.closingDate || "")
-    ) {
-      updateForm(formId, {
-        title: formName,
-        description: formDescription,
-        category: category || undefined,
-        status,
-        allowMultipleSubmissions,
-        anonymousResponses,
-        closingDate: closingDate || undefined,
-      });
-      setSavedIndicator(true);
-      setTimeout(() => setSavedIndicator(false), 2000);
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+    
+    // Compare against initial values, not current form values (prevents infinite loop)
+    const initial = initialValuesRef.current;
+    const hasChanges = 
+      formName !== initial.title ||
+      formDescription !== initial.description ||
+      category !== initial.category ||
+      status !== initial.status ||
+      allowMultipleSubmissions !== initial.allowMultipleSubmissions ||
+      anonymousResponses !== initial.anonymousResponses ||
+      closingDate !== initial.closingDate;
+    
+    if (hasChanges) {
+      // Debounce the save to prevent rapid updates
+      saveTimeoutRef.current = setTimeout(() => {
+        // Prevent saving if we're already saving
+        if (isSavingRef.current) return;
+        
+        isSavingRef.current = true;
+        updateForm(formId, {
+          title: formName,
+          description: formDescription,
+          category: category || undefined,
+          status,
+          allowMultipleSubmissions,
+          anonymousResponses,
+          closingDate: closingDate || undefined,
+        });
+        
+        // Update initial values to match what we just saved
+        if (initialValuesRef.current) {
+          initialValuesRef.current = {
+            title: formName,
+            description: formDescription,
+            category: category || "",
+            status,
+            allowMultipleSubmissions,
+            anonymousResponses,
+            closingDate: closingDate || "",
+          };
+        }
+        
+        setSavedIndicator(true);
+        setTimeout(() => {
+          setSavedIndicator(false);
+          isSavingRef.current = false;
+        }, 2000);
+      }, 800); // 800ms debounce
+    }
+    
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formName, formDescription, category, status, allowMultipleSubmissions, anonymousResponses, closingDate]);
+  }, [formName, formDescription, category, status, allowMultipleSubmissions, anonymousResponses, closingDate, formId]);
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -87,7 +156,7 @@ export default function FormEditPage() {
 
   const handleOpenAsUser = () => {
     if (!form) return;
-    window.open(`/user/form/${form.accessKey}`, "_blank");
+    window.open(`/user/form/${form.accessKey}?test=true`, "_blank");
   };
 
   const isFormClosed = form?.closingDate ? new Date(form.closingDate) < new Date() : false;
@@ -109,7 +178,8 @@ export default function FormEditPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="sticky top-20 z-10 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-500/20 px-4 py-2 text-sm text-green-400"
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="sticky top-20 z-10 flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground font-light"
         >
           <Check className="h-4 w-4" />
           <span>Saved</span>
@@ -117,7 +187,7 @@ export default function FormEditPage() {
       )}
 
       {/* Form Basic Info */}
-      <Card className="border-border/70 bg-card/80">
+      <Card className="border-border bg-card shadow-inset">
         <CardHeader>
           <CardTitle>Form Details</CardTitle>
           <CardDescription>Manage basic information about your form</CardDescription>
@@ -159,7 +229,7 @@ export default function FormEditPage() {
       </Card>
 
       {/* Access Key Management */}
-      <Card className="border-border/70 bg-card/80">
+      <Card className="border-border bg-card shadow-inset">
         <CardHeader>
           <CardTitle>Access & Sharing</CardTitle>
           <CardDescription>Manage access keys and sharing options</CardDescription>
@@ -206,9 +276,9 @@ export default function FormEditPage() {
               <RefreshCw className="h-4 w-4" />
               Regenerate Access Key
             </Button>
-            <Button variant="outline" onClick={handleOpenAsUser} className="gap-2">
+            <Button variant="primary" onClick={handleOpenAsUser} className="gap-2 lowercase">
               <ExternalLink className="h-4 w-4" />
-              Open as User
+              Test as User
             </Button>
           </div>
 
@@ -216,12 +286,13 @@ export default function FormEditPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border border-yellow-500/50 bg-yellow-500/20 p-4"
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="rounded-lg border border-border bg-secondary p-4"
             >
               <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-yellow-400 shrink-0 mt-0.5" />
+                <AlertTriangle className="h-5 w-5 text-foreground shrink-0 mt-0.5" />
                 <div className="flex-1 space-y-2">
-                  <p className="text-sm font-medium text-yellow-400">
+                  <p className="text-sm font-light text-foreground">
                     Are you sure? Users with the old key will no longer be able to access this form.
                   </p>
                   <div className="flex gap-2">
@@ -240,7 +311,7 @@ export default function FormEditPage() {
       </Card>
 
       {/* Form Status & Settings */}
-      <Card className="border-border/70 bg-card/80">
+      <Card className="border-border bg-card shadow-inset">
         <CardHeader>
           <CardTitle>Form Settings</CardTitle>
           <CardDescription>Configure form behavior and restrictions</CardDescription>
@@ -325,7 +396,7 @@ export default function FormEditPage() {
               If set and current date passes the closing date, the form will be closed.
             </p>
             {isFormClosed && (
-              <div className="flex items-center gap-2 text-sm text-yellow-400">
+              <div className="flex items-center gap-2 text-sm text-foreground font-light">
                 <AlertTriangle className="h-4 w-4" />
                 <span>This form is currently closed</span>
               </div>

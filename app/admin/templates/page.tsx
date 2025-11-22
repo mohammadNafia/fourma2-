@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Calendar, Copy, Eye, FileEdit, Plus, LayoutTemplate, Trash2, AlertTriangle } from "lucide-react";
+import { Calendar, Copy, Eye, FileEdit, Plus, LayoutTemplate, Trash2, AlertTriangle, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useForms } from "@/components/shared/forms-store";
@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export default function TemplatesPage() {
   const router = useRouter();
-  const { templates, deleteTemplate, duplicateTemplate, createFormFromTemplate } = useForms();
+  const { templates, deleteTemplate, duplicateTemplate, createFormFromTemplate, publishTemplateAsForm } = useForms();
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
@@ -23,6 +23,15 @@ export default function TemplatesPage() {
       toast("Form created from template", "success");
     } catch (error) {
       toast("Failed to create form from template", "error");
+    }
+  };
+
+  const handlePublishTemplate = (templateId: string) => {
+    try {
+      const form = publishTemplateAsForm(templateId);
+      toast(`Form published! Access Key: ${form.accessKey}`, "success");
+    } catch (error) {
+      toast("Failed to publish template as form", "error");
     }
   };
 
@@ -118,11 +127,19 @@ export default function TemplatesPage() {
                   <div className="grid grid-cols-1 gap-2 text-sm">
                     <Button
                       variant="primary"
-                      className="justify-start"
+                      className="justify-start lowercase"
                       onClick={() => handleUseTemplate(template.templateId)}
                     >
                       <LayoutTemplate className="mr-2 h-4 w-4" />
                       Use Template
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="justify-start lowercase border border-border/70"
+                      onClick={() => handlePublishTemplate(template.templateId)}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Publish as Form
                     </Button>
                     <div className="grid grid-cols-2 gap-2">
                       <Button

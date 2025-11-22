@@ -6,26 +6,26 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         primary:
-          "bg-[--primary-gradient] text-primary-foreground shadow-[0_10px_40px_rgba(99,102,241,0.25)] dark:shadow-[0_10px_40px_rgba(124,58,237,0.45)] hover:scale-[1.01] hover:brightness-105 active:scale-[0.99]",
+          "bg-primary text-primary-foreground rounded-[10px] hover:opacity-90 active:scale-[0.98] border border-transparent",
         secondary:
-          "bg-secondary text-secondary-foreground border border-border/70 hover:border-border hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground rounded-[10px] border border-border hover:bg-secondary/80",
         outline:
-          "border border-border/70 bg-transparent text-foreground hover:bg-foreground/5 hover:border-border",
+          "border border-border bg-transparent text-foreground rounded-[10px] hover:bg-accent hover:border-foreground/20",
         ghost:
-          "text-foreground hover:bg-foreground/5 border border-transparent hover:border-border/50",
+          "text-foreground rounded-[10px] border border-transparent bg-transparent hover:bg-accent",
         subtle:
-          "bg-muted text-foreground hover:bg-muted/80 border border-border/60",
+          "bg-muted text-foreground rounded-[10px] border border-border hover:bg-muted/80",
       },
       size: {
-        sm: "h-9 px-3",
-        md: "h-10 px-4",
-        lg: "h-11 px-6 text-base",
-        icon: "h-10 w-10 p-0",
+        sm: "h-9 px-4 text-xs",
+        md: "h-11 px-5 text-sm",
+        lg: "h-12 px-6 text-base",
+        icon: "h-11 w-11 p-0",
       },
       shape: {
         pill: "rounded-full",

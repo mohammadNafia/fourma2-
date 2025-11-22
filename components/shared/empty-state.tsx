@@ -37,29 +37,48 @@ export function EmptyState({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
       className={className}
     >
-      <Card className="border-dashed border-border/70 bg-card/70">
-        <CardContent className="py-12 text-center">
+      <Card className="border-dashed border-border/50 bg-card/60 backdrop-blur-xl">
+        <CardContent className="py-16 text-center">
           {Icon && (
-            <div className="flex justify-center mb-4">
-              <div className="rounded-full bg-muted/50 p-4">
-                <Icon className="h-8 w-8 text-muted-foreground" />
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              className="flex justify-center mb-6"
+            >
+              <div className="rounded-full bg-[--electric-purple]/10 border border-[--electric-purple]/30 p-5 shadow-glow-purple">
+                <Icon className="h-10 w-10 text-[--electric-purple]" />
               </div>
-            </div>
+            </motion.div>
           )}
-          <CardTitle className="mb-2">{title}</CardTitle>
-          <CardDescription className="mb-6">{description}</CardDescription>
-          {(actionLabel && (actionUrl || onAction)) && (
-            <Button variant="primary" onClick={handleAction}>
-              {actionLabel}
-            </Button>
-          )}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <CardTitle className="mb-3 text-3xl">{title}</CardTitle>
+            <CardDescription className="mb-8 max-w-md mx-auto text-base leading-relaxed">{description}</CardDescription>
+            {(actionLabel && (actionUrl || onAction)) && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <Button variant="primary" onClick={handleAction}>
+                  {actionLabel}
+                </Button>
+              </motion.div>
+            )}
+          </motion.div>
         </CardContent>
       </Card>
     </motion.div>
   );
 }
+
 
